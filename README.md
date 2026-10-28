@@ -36,6 +36,6 @@ Mouse: pitch/yaw. A/D: continuous roll. Q/E: rudder. W/S: throttle. Shift: boost
 
 ## Verified / remaining
 
-14 automated tests pass, including full quaternion loop/roll, collision tunneling/lethal hits/scrapes, deterministic replay, gun obstruction, lock/release ammo, 10 independent real WebSocket connections sharing snapshots, room capacity, forged-position rejection and message flood disconnect.
+16 automated tests pass, including full quaternion loop/roll, collision tunneling/lethal hits/scrapes, deterministic replay, gun obstruction, lock/release ammo, 10 independent real WebSocket connections sharing snapshots, safe spawns, stepped landmark colliders, room capacity, forged-position rejection and message flood disconnect.
 
 Cloud QA browser currently disables WebGL; 3D rendering, chase-camera feel, desktop/mobile frame-rate and real-device touch are **not visually verified**. Three.js jet/effects construction was smoke-tested. This is a playable initial implementation requiring real GPU playtesting and weapon/flight balancing, not a claim of production readiness. Reconnect rejoins the room with a new player identity; rooms and scores are memory-only and reset on server restart. No account persistence, matchmaking, spectator mode or anti-cheat beyond authority/protocol validation.

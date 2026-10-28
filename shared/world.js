@@ -12,8 +12,13 @@ for(let row=0;row<8;row++) for(let col=0;col<9;col++) {
  const h=55+seed*2.6;
  add(`block-${row}-${col}`,x,z,90+(seed%3)*15,100+(seed%4)*12,h,seed%3===0?'ivory':seed%3===1?'glass':'charcoal',col<2?'Harbour Reach':row<3?'Northbank':'Meridian Core');
 }
-add('meridian-one',110,0,130,150,550,'glass');
-add('meridian-two',380,0,115,130,490,'charcoal');
+add('meridian-one',110,0,150,165,380,'glass');
+add('meridian-one-shoulder',110,0,112,125,475,'glass');
+add('meridian-one-crown',110,0,64,76,550,'ivory');
+add('meridian-two',380,0,135,145,340,'charcoal');
+add('meridian-two-shoulder',380,0,95,105,440,'charcoal');
+add('meridian-two-crown',380,0,48,58,490,'ivory');
+for(let i=0;i<4;i++) add(`harbour-pier-${i}`,-1140,-650+i*400,250,65,9,'ivory','Harbour Reach');
 add('lighthouse',-1010,-950,55,55,175,'ivory','Harbour Reach');
 // Roof installations fit inside their buildings' collision envelopes: painted
 // roof pads and inset skylights provide detail without invisible obstacles.

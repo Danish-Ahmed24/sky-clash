@@ -56,7 +56,15 @@ export function createJet(type='falcon', color=0xaebdca) {
     const light=new THREE.Mesh(new THREE.SphereGeometry(.085,6,4),new THREE.MeshBasicMaterial({color:sign<0?0xff4d39:0x61ffce}));
     light.position.set(sign*(stealth?6.1:5),.12,-2.7);jet.add(light);nav.push(light);
   }
-  jet.userData={flames,nav,core,stealth};return jet;
+  let disposed=false;
+  function dispose(){
+    if(disposed)return;disposed=true;
+    const geometries=new Set(),materials=new Set([hull,dark,edge,orange,glass,exhaust]);
+    jet.traverse(object=>{if(object.geometry)geometries.add(object.geometry);for(const material of (Array.isArray(object.material)?object.material:[object.material]))if(material)materials.add(material);});
+    for(const geometry of geometries)geometry.dispose();for(const material of materials)material.dispose();
+    jet.removeFromParent();
+  }
+  jet.userData={flames,nav,core,stealth,dispose};return jet;
 }
 export function animateJet(jet,state={},time=0) {
   const boost=Boolean(state.afterburner||state.boosting||state.boost===true);
