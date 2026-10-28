@@ -1,0 +1,15 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {createFlightState,stepFlight,forwardVector,segmentBuilding} from '../shared/flight.js';
+const fly=(s,i,n=30)=>{for(let k=0;k<n;k++)stepFlight(s,i,1/30);return s;};
+test('forward is +Z and state does not alias spawn',()=>{const spawn={p:[0,200,0],q:[0,0,0,1]},s=createFlightState(spawn);s.p[0]=1;assert.equal(spawn.p[0],0);assert.deepEqual(forwardVector(s.q),[0,0,1]);});
+test('identical inputs produce identical deterministic states',()=>{assert.deepEqual(fly(createFlightState(),{pitch:.7,roll:.3,boost:true}),fly(createFlightState(),{pitch:.7,roll:.3,boost:true}));});
+test('quaternion remains normalized after continuous full rolls',()=>{const s=fly(createFlightState(),{roll:1},160);assert.ok(Math.abs(Math.hypot(...s.q)-1)<1e-12);assert.ok(Math.abs(s.q[2])>.01);});
+test('full loop continues through inverted attitude',()=>{const s=createFlightState({p:[0,600,0]});fly(s,{pitch:1},90);assert.ok(forwardVector(s.q)[2]<-.9);assert.ok(s.health>0);});
+test('throttle and boost change speed and consume fuel',()=>{const a=fly(createFlightState(),{throttle:1}),b=fly(createFlightState(),{throttle:1,boost:true});assert.ok(b.speed>a.speed);assert.ok(b.boost<a.boost);});
+test('swept collision catches thin building at high speed',()=>{const hit=segmentBuilding([0,50,-100],[0,50,100],{x:0,z:0,width:20,depth:1,height:100});assert.ok(hit);assert.ok(hit.t<.5);});
+test('direct high speed tower impact destroys jet',()=>{const s=createFlightState({p:[0,100,-7]});stepFlight(s,{},.1,[{x:0,z:0,width:50,depth:2,height:200}]);assert.equal(s.health,0);});
+test('grazing tower collision damages without instant destruction',()=>{const s=createFlightState({p:[-13.5,100,0]});s.v=[15,0,125];stepFlight(s,{yaw:.01},.1,[{x:0,z:0,width:20,depth:300,height:200}]);assert.ok(s.health<100);assert.ok(s.health>0);});
+test('world bounds stay finite and contain aircraft',()=>{const s=createFlightState({p:[1799,1099,0]});s.v=[300,300,0];stepFlight(s,{},.1);assert.ok(s.p[0]<=1800&&s.p[1]<=1100);assert.ok(s.p.every(Number.isFinite));});
+test('dead aircraft cannot move',()=>{const s=createFlightState();s.health=0;const p=[...s.p];stepFlight(s,{boost:true});assert.deepEqual(s.p,p);});
+test('nonfinite controls cannot poison simulation',()=>{const s=fly(createFlightState(),{pitch:NaN,yaw:Infinity,throttle:Infinity});assert.ok([...s.p,...s.q].every(Number.isFinite));});
